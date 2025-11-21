@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Jeu de Calcul Mental</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; margin-top: 40px; background:#f7f7f7; }
+  #container { background:white; display:inline-block; padding:20px 40px; border-radius:15px; box-shadow:0 0 15px rgba(0,0,0,0.2); }
+  .operation { font-size: 40px; margin: 20px 0; font-weight: bold; }
+  input { font-size:22px; padding:5px 10px; }
+  button { font-size:20px; padding:10px 20px; margin-top:15px; cursor:pointer; }
+  #score, #niveau, #serie { font-size:22px; margin:10px; }
+</style>
+</head>
+<body>
+  <div id="container">
+    <h1>Jeu de Calcul Mental</h1>
+    <div id="niveau">Niveau : 1</div>
+    <div id="score">Score : 0</div>
+    <div id="serie">Série : 0</div>
+
+    <div class="operation" id="operation"></div>
+
+    <input type="number" id="reponse" placeholder="Votre réponse" />
+    <br>
+    <button onclick="valider()">Valider</button>
+  </div>
+
+<script>
+let niveau = 1;
+let score = 0;
+let serie = 0;
+let reponseCorrecte = 0;
+
+function nouvelleOperation() {
+  let max = 10 + (niveau - 1) * 10;
+
+  let a = Math.floor(Math.random() * max) + 1;
+  let b = Math.floor(Math.random() * max) + 1;
+
+  let operations = ["+", "-", "*", "/"];
+  let op = operations[Math.floor(Math.random() * operations.length)];
+
+  if (op === "/") {
+    reponseCorrecte = a;
+    b = a * (Math.floor(Math.random() * 9) + 1);
+    a = b;
+  }
+
+  if (op === "+") reponseCorrecte = a + b;
+  if (op === "-") reponseCorrecte = a - b;
+  if (op === "*") reponseCorrecte = a * b;
+  if (op === "/") reponseCorrecte = b / (b / a);
+
+  document.getElementById("operation").innerText = `${a} ${op} ${b}`;
+}
+
+function valider() {
+  let r = Number(document.getElementById("reponse").value);
+
+  if (r === reponseCorrecte) {
+    score++;
+    serie++;
+
+    if (serie === 5) {
+      niveau++;
+      serie = 0;
+    }
+  } else {
+    serie = 0;
+  }
+
+  document.getElementById("score").innerText = "Score : " + score;
+  document.getElementById("serie").innerText = "Série : " + serie;
+  document.getElementById("niveau").innerText = "Niveau : " + niveau;
+  document.getElementById("reponse").value = "";
+  nouvelleOperation();
+}
+
+nouvelleOperation();
+</script>
+</body>
+</html>
