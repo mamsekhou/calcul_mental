@@ -3,21 +3,22 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Jeu de Calcul Mental</title>
+<title>Jeu de Calcul Mental VS Ordinateur</title>
 <style>
   body { font-family: Arial, sans-serif; text-align: center; margin-top: 40px; background:#f7f7f7; }
   #container { background:white; display:inline-block; padding:20px 40px; border-radius:15px; box-shadow:0 0 15px rgba(0,0,0,0.2); }
   .operation { font-size: 40px; margin: 20px 0; font-weight: bold; }
   input { font-size:22px; padding:5px 10px; }
   button { font-size:20px; padding:10px 20px; margin-top:15px; cursor:pointer; }
-  #score, #niveau, #serie { font-size:22px; margin:10px; }
+  #score, #scoreOrdinateur, #niveau, #serie { font-size:22px; margin:10px; }
 </style>
 </head>
 <body>
   <div id="container">
-    <h1>Jeu de Calcul Mental</h1>
+    <h1>Jeu de Calcul Mental VS Ordinateur</h1>
     <div id="niveau">Niveau : 1</div>
-    <div id="score">Score : 0</div>
+    <div id="score">Votre score : 0</div>
+    <div id="scoreOrdinateur">Ordinateur : 0</div>
     <div id="serie">Série : 0</div>
 
     <div class="operation" id="operation"></div>
@@ -30,16 +31,17 @@
 <script>
 let niveau = 1;
 let score = 0;
+let scoreOrdi = 0;
 let serie = 0;
 let reponseCorrecte = 0;
+let max = 10;
 
 function nouvelleOperation() {
-  let max = 10 + (niveau - 1) * 10;
-
+  max = 10 + (niveau - 1) * 10;
   let a = Math.floor(Math.random() * max) + 1;
   let b = Math.floor(Math.random() * max) + 1;
 
-  let operations = ["+", "-", "*", "/"];
+  let operations = ["+", "-", "*", "/", "%", "^"];
   let op = operations[Math.floor(Math.random() * operations.length)];
 
   if (op === "/") {
@@ -52,6 +54,8 @@ function nouvelleOperation() {
   if (op === "-") reponseCorrecte = a - b;
   if (op === "*") reponseCorrecte = a * b;
   if (op === "/") reponseCorrecte = b / (b / a);
+  if (op === "%") reponseCorrecte = a % b;
+  if (op === "^") reponseCorrecte = Math.pow(a,2);
 
   document.getElementById("operation").innerText = `${a} ${op} ${b}`;
 }
@@ -59,24 +63,39 @@ function nouvelleOperation() {
 function valider() {
   let r = Number(document.getElementById("reponse").value);
 
-  if (r === reponseCorrecte) {
+  // L'ordinateur tente de répondre avant le joueur
+  let tempsOrdi = Math.random(); // plus petit = répond plus vite
+  let tempsJoueur = Math.random(); // plus petit = joueur répond plus vite
+
+  let joueurGagne = (r === reponseCorrecte) && (tempsJoueur < tempsOrdi);
+  let ordiGagne = (tempsOrdi < tempsJoueur);
+
+  if (ordiGagne) {
+    scoreOrdi++;
+    serie = 0;
+    alert("Perdu, l'ordinateur a trouvé avant toi !");
+  } else if (joueurGagne) {
     score++;
     serie++;
-
-    if (serie === 5) {
-      niveau++;
-      serie = 0;
-    }
+    alert("Bravo, tu as gagné !");
   } else {
     serie = 0;
   }
 
-  document.getElementById("score").innerText = "Score : " + score;
+  if (serie === 5) {
+    niveau++;
+    serie = 0;
+    alert("Félicitations ! Niveau suivant !");
+  }
+
+  document.getElementById("score").innerText = "Votre score : " + score;
+  document.getElementById("scoreOrdinateur").innerText = "Ordinateur : " + scoreOrdi;
   document.getElementById("serie").innerText = "Série : " + serie;
   document.getElementById("niveau").innerText = "Niveau : " + niveau;
   document.getElementById("reponse").value = "";
   nouvelleOperation();
 }
+
 
 nouvelleOperation();
 </script>
